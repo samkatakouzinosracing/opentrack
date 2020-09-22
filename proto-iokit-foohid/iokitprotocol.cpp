@@ -25,14 +25,14 @@ IOKitProtocol::IOKitProtocol()
 module_status IOKitProtocol::initialize()
 {
     if (!joystick)
-        return otr_tr("Load failure");
+        return tr("Load failure");
 
     if (joystick->hasError())
     {
         QString msg = joystick->errorMessage();
 
         if (msg.isEmpty())
-            msg = otr_tr("Unknown error");
+            msg = tr("Unknown error");
 
         return error(msg);
     }
@@ -47,7 +47,7 @@ static uint8_t valueToStick(FooHIDJoystick *stick, double min, double value, dou
                    stick->minValue() + stick->range()));
 }
 
-void IOKitProtocol::pose(const double *headpose)
+void IOKitProtocol::pose(const double *headpose, const double*)
 {
     const uint8_t x  = valueToStick(joystick.get(), -75., headpose[0], +75.);
     const uint8_t y  = valueToStick(joystick.get(), -75., headpose[1], +75.);

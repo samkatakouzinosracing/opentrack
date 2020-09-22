@@ -6,11 +6,29 @@
 
 #include "ui_ftnoir_winecontrols.h"
 
-#include <QString>
-#include <QProcess>
+#include "options/options.hpp"
+using namespace options;
+
 #include <QMutex>
+#include <QProcess>
+#include <QString>
+#include <QVariant>
 
 #include <QDebug>
+
+struct settings : opts
+{
+    settings() : opts{"proto-wine"} {}
+    value<bool> variant_proton{b, "variant-proton", false },
+                variant_wine{b, "variant-wine", true },
+                fsync{b, "fsync", true},
+                esync{b, "esync", true};
+
+    value<int>     proton_appid{b, "proton-appid", 0};
+    value<QVariant> proton_path{b, "proton-version", {} };
+    value<QString> wineprefix{b, "wineprefix", "~/.wine"};
+    value<int>     protocol{b, "protocol", 2};
+};
 
 class wine : TR, public IProtocol
 {
@@ -21,7 +39,7 @@ public:
     ~wine() override;
 
     module_status initialize() override;
-    void pose(const double* headpose) override;
+    void pose(const double* headpose, const double*) override;
 
     QString game_name() override
     {
@@ -35,6 +53,7 @@ public:
 private:
     shm_wrapper lck_shm { WINE_SHM_NAME, WINE_MTX_NAME, sizeof(WineSHM) };
     WineSHM* shm = nullptr;
+    settings s;
 
 #ifndef OTR_WINE_NO_WRAPPER
     QProcess wrapper;
@@ -55,6 +74,7 @@ public:
 
 private:
     Ui::UICFTControls ui;
+    settings s;
 
 private slots:
     void doOK();
